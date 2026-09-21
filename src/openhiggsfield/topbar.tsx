@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/brand";
+
 import { VIEWS, VIEW_LABELS, type GalleryView } from "./data";
+import { FuturuMark } from "./futuru-mark";
 import { AssetsIcon, HeartIcon, ImageIcon, KeyIcon, VideoIcon } from "./icons";
 
 const VIEW_ICONS: Record<GalleryView, () => React.ReactNode> = {
@@ -17,14 +20,22 @@ export function Topbar({
   onView,
   busy,
   keyConfigured,
+  keyManaged,
   onKeys,
 }: {
   view: GalleryView;
   onView: (next: GalleryView) => void;
   busy: boolean;
   keyConfigured: boolean;
+  keyManaged: boolean;
   onKeys: () => void;
 }) {
+  const keyLabel = keyManaged ? "Team key" : keyConfigured ? "Your key" : "Add key";
+  const keyAction = keyManaged
+    ? "Team key and session"
+    : keyConfigured
+      ? "Edit platform key"
+      : "Add platform key";
   const tabsRef = useRef<HTMLDivElement>(null);
   const [thumb, setThumb] = useState<{ x: number; w: number } | null>(null);
 
@@ -41,7 +52,7 @@ export function Topbar({
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(tabs);
-    // Inter swaps in after first paint and the labels resize under it.
+    // The web font swaps in after first paint and the labels resize under it.
     void document.fonts.ready.then(measure);
     return () => {
       live = false;
@@ -72,7 +83,12 @@ export function Topbar({
 
   return (
     <div className="ohf-topbar">
-      <h1 className="ohf-sr">OpenHiggsfield AI — Open source AI studio</h1>
+      <h1 className="ohf-sr">{`${BRAND_NAME} — ${BRAND_DESCRIPTOR}`}</h1>
+
+      <div className="ohf-bar ohf-brand ohf-enter-1" aria-hidden>
+        <FuturuMark size={26} />
+        <span className="ohf-brand-name">{BRAND_NAME}</span>
+      </div>
 
       <div className="ohf-bar ohf-enter-1">
         <div
@@ -120,9 +136,9 @@ export function Topbar({
         </div>
       </div>
 
-      {/* Generations run on the visitor's own platform key, so this both states
-          whether one is held and opens the modal that sets it — and its lamp is
-          the studio's liveness, the one place accent moves. */}
+      {/* States whether a key is held — the team's, on the server, or one set in
+          this browser — and opens the modal that manages it and the session.
+          Its lamp is the studio's liveness, the one place accent moves. */}
       <div className="ohf-bar ohf-enter-1">
         <button
           type="button"
@@ -130,11 +146,11 @@ export function Topbar({
           data-busy={busy}
           data-ready={keyConfigured}
           onClick={onKeys}
-          aria-label={keyConfigured ? "Edit platform key" : "Add platform key"}
-          title={keyConfigured ? "Edit platform key" : "Add platform key"}
+          aria-label={keyAction}
+          title={keyAction}
         >
           <KeyIcon />
-          <span className="ohf-key-text">{keyConfigured ? "Your key" : "Add key"}</span>
+          <span className="ohf-key-text">{keyLabel}</span>
           <span className="ohf-lamp" />
         </button>
       </div>

@@ -1,8 +1,9 @@
-/* OpenHiggsfield AI — scoped design system.
-   Identity: near-black studio, one lime accent reserved for selection,
-   primary action and liveness. Structure = hairline borders; elevation =
-   offset shadows. One face throughout: Inter, with tabular numerals where the
-   type carries measurement. */
+/* Futuru Studio — scoped design system (built on OpenHiggsfield's).
+   Identity: near-black studio, one Futuru-blue accent reserved for selection,
+   primary action and liveness; the brand gradient marks the primary action
+   alone. Structure = hairline borders; elevation = offset shadows. One face
+   throughout: Instrument Sans, with tabular numerals where the type carries
+   measurement. */
 
 .ohf {
   --bg: #0a0a0b;
@@ -20,12 +21,21 @@
      --tx-off is the dimmer value reserved for disabled controls. */
   --tx4: #7d8486;
   --tx-off: #5c6365;
-  --accent: #d1fe17;
-  --accent-strong: #ddfe51;
-  --accent-ink: #141a02;
-  --accent-08: rgba(209, 254, 23, 0.08);
-  --accent-14: rgba(209, 254, 23, 0.14);
-  --accent-32: rgba(209, 254, 23, 0.32);
+  /* Blue is darker than lime, so the accent splits in two. Fills, frames and
+     lamps take Futuru blue one step deeper than the brand's #2970ff, so white
+     ink on it holds 4.5:1 (4.96). Type and glyphs on the dark ground take the
+     brand's light blue, which the fill colour could not carry at body size.
+     The translucent steps sit on a lighter blue and a higher alpha than lime
+     needed, or they vanish into the near-black. */
+  --accent: #2466f0;
+  --accent-strong: #2970ff;
+  --accent-ink: #ffffff;
+  --accent-text: #93bbff;
+  --accent-text-strong: #bcd4ff;
+  --accent-08: rgba(91, 146, 255, 0.12);
+  --accent-14: rgba(91, 146, 255, 0.2);
+  --accent-32: rgba(91, 146, 255, 0.5);
+  --brand-gradient: linear-gradient(120deg, #1f2aff 0%, #7b18f0 55%, #c808dc 100%);
   /* Smoked plate for chrome that sits on a returned picture. 0.7 holds the
      4.5:1 ink floor even against a blown-out white frame; lighter did not. */
   --plate: rgba(6, 9, 8, 0.7);
@@ -37,7 +47,7 @@
   --ease: cubic-bezier(0.2, 0, 0, 1);
   /* Deeper exponential ease-out — the scope indicator's travel. */
   --ease-slide: cubic-bezier(0.16, 1, 0.3, 1);
-  --font-ui: var(--font-ohf-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-ui: var(--font-ohf-ui), ui-sans-serif, system-ui, sans-serif;
   --danger: #ff8d78;
   --danger-bg: rgba(255, 141, 120, 0.1);
   --danger-line: rgba(255, 141, 120, 0.28);
@@ -48,8 +58,8 @@
   color: var(--tx);
   background: var(--bg);
   color-scheme: dark;
-  caret-color: var(--accent);
-  accent-color: var(--accent);
+  caret-color: var(--accent-text);
+  accent-color: var(--accent-text);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -83,8 +93,8 @@
 }
 
 .ohf ::selection {
-  background: rgba(209, 254, 23, 0.28);
-  color: #fbfef1;
+  background: rgba(91, 146, 255, 0.35);
+  color: #ffffff;
 }
 
 /* :where() keeps the reset at zero extra specificity so component classes win. */
@@ -374,6 +384,23 @@
   box-shadow: var(--shadow-2), var(--glint);
 }
 
+/* The one place the studio names itself. A quiet pill: the mark carries the
+   brand's colour, the name stays in the chrome's own ink. */
+.ohf-brand {
+  gap: 9px;
+  padding: 0 14px 0 10px;
+}
+.ohf-brand svg {
+  flex-shrink: 0;
+}
+.ohf-brand-name {
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--tx);
+}
+
 /* The studio's page heading; the bar carries scope, not brand. */
 .ohf-sr {
   position: absolute;
@@ -457,7 +484,7 @@
   color: var(--tx);
 }
 .ohf-tab[aria-selected="true"] svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* ---------- platform lamp ---------- */
@@ -498,7 +525,7 @@
 }
 .ohf-key[data-ready="true"] svg,
 .ohf-key[data-busy="true"] svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ohf-key[data-busy="true"] {
   color: var(--tx);
@@ -688,13 +715,13 @@
   transform: scale(0.92);
 }
 .ohf-tile-act[data-on="true"] {
-  color: var(--accent);
+  color: var(--accent-text);
   border-color: var(--accent-32);
 }
 .ohf-tile-act[data-on="true"]:hover {
   background: rgba(9, 13, 12, 0.86);
   border-color: var(--accent);
-  color: var(--accent-strong);
+  color: var(--accent-text-strong);
 }
 .ohf-tile-act--danger:hover {
   background: rgba(40, 14, 11, 0.88);
@@ -1621,12 +1648,12 @@
 .ohf-selact[data-on="true"] {
   background: var(--accent-08);
   border-color: var(--accent-32);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ohf-selact[data-on="true"]:hover {
   background: var(--accent-14);
   border-color: var(--accent);
-  color: var(--accent-strong);
+  color: var(--accent-text-strong);
 }
 .ohf-selact--danger:hover:not(:disabled) {
   background: var(--danger-bg);
@@ -1771,7 +1798,7 @@
 .ohf-ctl--flag[aria-pressed="true"] {
   background: var(--accent-14);
   border-color: var(--accent-32);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ohf-ctl--model {
   background: var(--s3);
@@ -1923,7 +1950,7 @@
   justify-content: center;
   gap: 8px;
   position: relative;
-  background: linear-gradient(180deg, #d9fe3e, var(--accent));
+  background: var(--brand-gradient);
   color: var(--accent-ink);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.4),
@@ -1950,7 +1977,7 @@
    grey of "you cannot press this". */
 .ohf-generate[data-busy="true"]:disabled {
   background: var(--accent-14);
-  color: var(--accent);
+  color: var(--accent-text);
   box-shadow: inset 0 0 0 1px var(--accent-32);
 }
 .ohf-generate-glyph {
@@ -1972,8 +1999,8 @@
   font-size: 11.5px;
   line-height: 1;
   letter-spacing: 0.02em;
-  /* One key, recoloured by the button's own state — on lime it reads as dark
-     ink, on the disabled grey it follows the label. */
+  /* One key, recoloured by the button's own state — on the brand gradient it
+     reads as white ink, on the disabled grey it follows the label. */
   color: inherit;
   opacity: 0.68;
   background: rgba(0, 0, 0, 0.16);
@@ -2181,7 +2208,7 @@
   transition: color 0.12s ease;
 }
 .ohf-menu-row:hover:not(:disabled) .ohf-menu-ic {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ohf-menu-row:disabled .ohf-menu-ic {
   color: var(--tx-off);
@@ -2272,7 +2299,7 @@
 }
 .ohf-opt[aria-pressed="true"] {
   background: var(--accent-08);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ohf-opt[aria-pressed="true"]:hover {
   background: var(--accent-14);
@@ -2339,7 +2366,7 @@
 .ohf-chip[aria-pressed="true"] {
   background: var(--accent-14);
   border-color: var(--accent-32);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ohf-slider {
   appearance: none;
@@ -2562,7 +2589,7 @@
 .ohf-model-row-check {
   width: 16px;
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--accent-text);
   display: flex;
   justify-content: center;
 }
@@ -3183,7 +3210,7 @@
   color: var(--tx);
 }
 .ohf-viewer-copy[data-done] {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 /* The words the run was made from: the one thing in the panel worth taking
    away by hand, so it is set as text on a plate, not as a caption. */
@@ -3283,12 +3310,12 @@
 .ohf-viewer-keep[data-on="true"] {
   background: var(--accent-08);
   border-color: var(--accent-32);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ohf-viewer-keep[data-on="true"]:hover {
   background: var(--accent-14);
   border-color: var(--accent);
-  color: var(--accent-strong);
+  color: var(--accent-text-strong);
 }
 .ohf-btn-quiet {
   height: 32px;
@@ -3446,7 +3473,7 @@ a.ohf-btn-solid {
   border-radius: 10px;
   font-size: 13px;
   font-weight: 620;
-  background: linear-gradient(180deg, #d9fe3e, var(--accent));
+  background: var(--brand-gradient);
   color: var(--accent-ink);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.4),
@@ -3542,6 +3569,22 @@ a.ohf-btn-solid {
   }
   .ohf-viewer-side-body {
     padding-bottom: 16px;
+  }
+}
+
+/* The name goes first, then the lamp's label, then the mark itself — the
+   brand is the one pill the studio works without. */
+@media (max-width: 900px) {
+  .ohf-brand-name {
+    display: none;
+  }
+  .ohf-brand {
+    padding: 0 10px;
+  }
+}
+@media (max-width: 560px) {
+  .ohf-brand {
+    display: none;
   }
 }
 
@@ -3733,4 +3776,86 @@ a.ohf-btn-solid {
   .ohf-generate-sheen {
     display: none;
   }
+}
+
+/* ---------- team key and session ---------- */
+
+/* The managed panel has no form, so its one action takes the form's inset. */
+.ohf-keys-panel > .ohf-keys-actions {
+  padding: 16px 18px 18px;
+}
+.ohf-keys-signout {
+  display: flex;
+  padding: 10px 18px 14px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- sign-in ---------- */
+
+/* The studio's own ground and panel, with the brand's colour held to one faint
+   wash behind the card: the gate should read as the studio, not a splash. */
+.ohf-login {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background:
+    radial-gradient(60% 50% at 50% 38%, rgba(91, 70, 255, 0.1), transparent 70%),
+    var(--bg);
+}
+.ohf-login-panel {
+  width: 380px;
+  max-width: 100%;
+  animation: ohf-rise 0.4s var(--ease-slide) both;
+}
+.ohf-login-head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 20px 0;
+}
+.ohf-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ohf-login-name {
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+}
+.ohf-login-copy {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--tx3);
+}
+.ohf-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px 20px;
+}
+.ohf-login-submit {
+  height: 38px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.005em;
+  color: #fff;
+  background: var(--brand-gradient);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition:
+    filter 0.15s ease,
+    transform 0.15s var(--ease);
+}
+.ohf-login-submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.ohf-login-submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.ohf-login-submit:disabled {
+  opacity: 0.6;
 }

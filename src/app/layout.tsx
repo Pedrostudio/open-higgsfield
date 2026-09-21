@@ -27,17 +27,9 @@ export const metadata: Metadata = {
   appleWebApp: { title: SITE_NAME },
   openGraph: openGraphFor({ path: "/" }),
   twitter: twitterFor(),
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
+  /* An internal tool behind a password: nothing here belongs in a search
+     result, and the sign-in page is all a crawler could reach anyway. */
+  robots: { index: false, follow: false },
 };
 
 /* The studio is the only surface, and it ships a single look, so the browser

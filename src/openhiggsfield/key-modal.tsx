@@ -2,17 +2,23 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
+import { logout } from "@/auth/actions";
 import { clearPlatformCredentials, savePlatformCredentials } from "@/generation/actions";
 
 import { CloseIcon } from "./icons";
 
 export function KeyModal({
   configured,
+  managed,
+  authEnabled,
   onClose,
   onSaved,
   onCleared,
 }: {
   configured: boolean;
+  /** The team key lives on the server, so there is no key to enter here. */
+  managed: boolean;
+  authEnabled: boolean;
   onClose: () => void;
   onSaved: () => void;
   onCleared: () => void;
@@ -56,6 +62,14 @@ export function KeyModal({
     }
   }
 
+  const signOut = authEnabled && (
+    <form action={logout}>
+      <button type="submit" className="ohf-btn-quiet" disabled={busy}>
+        Sign out
+      </button>
+    </form>
+  );
+
   return (
     <dialog
       ref={ref}
@@ -69,12 +83,14 @@ export function KeyModal({
         <div className="ohf-keys-head">
           <div>
             <div id="ohf-keys-title" className="ohf-keys-title">
-              API key
+              {managed ? "Team key" : "API key"}
             </div>
             <p className="ohf-keys-copy">
-              {configured
-                ? "A key is saved in this browser. Enter a new id:secret pair to replace it."
-                : "Paste your platform key as id:secret. It stays in an httpOnly cookie and is sent as Authorization: Key id:secret."}
+              {managed
+                ? "Generations run on Futuru’s Higgsfield key, held on the server. There is nothing to set up in this browser."
+                : configured
+                  ? "A key is saved in this browser. Enter a new id:secret pair to replace it."
+                  : "Paste your platform key as id:secret. It stays in an httpOnly cookie and is sent as Authorization: Key id:secret."}
             </p>
           </div>
           <button type="button" className="ohf-icon-btn" aria-label="Close" onClick={onClose}>
@@ -82,37 +98,43 @@ export function KeyModal({
           </button>
         </div>
 
-        <form className="ohf-keys-form" onSubmit={(event) => void onSubmit(event)}>
-          <label className="ohf-field">
-            <div className="ohf-field-label">API key</div>
-            <input
-              className="ohf-input ohf-input--mono"
-              name="api_key"
-              type="password"
-              autoComplete="off"
-              spellCheck={false}
-              value={apiKey}
-              onChange={(event) => setApiKey(event.target.value)}
-            />
-          </label>
+        {managed ? (
+          signOut && <div className="ohf-keys-actions">{signOut}</div>
+        ) : (
+          <form className="ohf-keys-form" onSubmit={(event) => void onSubmit(event)}>
+            <label className="ohf-field">
+              <div className="ohf-field-label">API key</div>
+              <input
+                className="ohf-input ohf-input--mono"
+                name="api_key"
+                type="password"
+                autoComplete="off"
+                spellCheck={false}
+                value={apiKey}
+                onChange={(event) => setApiKey(event.target.value)}
+              />
+            </label>
 
-          {error && (
-            <div className="ohf-alert" role="alert">
-              <span className="ohf-alert-text">{error}</span>
-            </div>
-          )}
-
-          <div className="ohf-keys-actions">
-            {configured && (
-              <button type="button" className="ohf-btn-quiet" disabled={busy} onClick={() => void onClear()}>
-                Remove key
-              </button>
+            {error && (
+              <div className="ohf-alert" role="alert">
+                <span className="ohf-alert-text">{error}</span>
+              </div>
             )}
-            <button type="submit" className="ohf-keys-save" disabled={busy || !apiKey.trim()}>
-              {busy ? "Saving…" : configured ? "Replace key" : "Save key"}
-            </button>
-          </div>
-        </form>
+
+            <div className="ohf-keys-actions">
+              {configured && (
+                <button type="button" className="ohf-btn-quiet" disabled={busy} onClick={() => void onClear()}>
+                  Remove key
+                </button>
+              )}
+              <button type="submit" className="ohf-keys-save" disabled={busy || !apiKey.trim()}>
+                {busy ? "Saving…" : configured ? "Replace key" : "Save key"}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {!managed && signOut && <div className="ohf-keys-signout">{signOut}</div>}
       </div>
     </dialog>
   );

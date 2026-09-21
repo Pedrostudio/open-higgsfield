@@ -2,6 +2,7 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import { UnauthorizedError, requireSession } from "@/auth/require-session";
 import {
   DEVICE_COOKIE,
   DEVICE_COOKIE_OPTIONS,
@@ -9,9 +10,22 @@ import {
   resolveDeviceId,
 } from "@/generation/device";
 
-// Anyone who can hit this route can upload. Gate it when auth exists.
+/* Uploads become public URLs on the team's Blob store, so the cap keeps one
+   stray file from costing much. Reference media rarely comes near it. */
+const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 
+/* Only a signed-in session may ask for an upload token. No onUploadCompleted
+   is registered, so Vercel never calls back here without the team's cookie. */
 export async function POST(request: Request): Promise<NextResponse> {
+  try {
+    await requireSession();
+  } catch (caught) {
+    if (caught instanceof UnauthorizedError) {
+      return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+    }
+    throw caught;
+  }
+
   const incoming = (await request.json()) as HandleUploadBody;
   const device =
     incoming.type === "blob.generate-client-token" ? await readDeviceId() : null;
@@ -37,6 +51,7 @@ export async function POST(request: Request): Promise<NextResponse> {
             "audio/wav",
             "audio/x-wav",
           ],
+          maximumSizeInBytes: MAX_UPLOAD_BYTES,
           addRandomSuffix: true,
         };
       },

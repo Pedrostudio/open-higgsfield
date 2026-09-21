@@ -15,6 +15,14 @@ export class MissingCredentialsError extends Error {
   }
 }
 
+/** The team key, held in the server's environment. When it is set it is the
+    only key the studio uses, and the per-browser key flow is switched off. A
+    malformed value throws rather than falling back, so a bad deploy is loud. */
+export function readServerKey(): string | null {
+  const raw = process.env.HF_API_KEY?.trim();
+  return raw ? requireIdAndSecret(raw) : null;
+}
+
 export function encodeCredentials(apiKey: string): string {
   return JSON.stringify({ apiKey });
 }

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { hasPlatformCredentials, submitGeneration } from "@/generation/actions";
+import { getPlatformKeyStatus, submitGeneration, type PlatformKeyStatus } from "@/generation/actions";
 import { MissingCredentialsError } from "@/generation/credentials";
 import { MODELS, getModel } from "@/generation/catalog";
 import type { Surface } from "@/generation/catalog";
@@ -154,8 +154,11 @@ function describeError(caught: unknown): string {
   if (caught instanceof MissingCredentialsError || message.includes("Missing platform key")) {
     return "Add your platform key to generate.";
   }
-  return `Generation failed — ${message}. Try again; if it repeats, check the key in the sidebar.`;
+  if (message.includes("session has ended")) return `${message}.`;
+  return `Generation failed — ${message}. Try again; if it repeats, reload the page.`;
 }
+
+const NO_KEY: PlatformKeyStatus = { configured: false, managed: false, authEnabled: false };
 
 export function OpenHiggsfieldApp({ fontClassName = "" }: { fontClassName?: string }) {
   const surface = useActive((state) => state.surface);
@@ -179,7 +182,8 @@ export function OpenHiggsfieldApp({ fontClassName = "" }: { fontClassName?: stri
      recent sheets on top, and a range extends from the last one touched. */
   const [selected, setSelected] = useState<string[]>([]);
   const [saving, setSaving] = useState<SaveProgress | null>(null);
-  const [keyConfigured, setKeyConfigured] = useState(false);
+  const [keyStatus, setKeyStatus] = useState<PlatformKeyStatus>(NO_KEY);
+  const keyConfigured = keyStatus.configured;
   const [keysOpen, setKeysOpen] = useState(false);
 
   const galleryRef = useRef<HTMLDivElement>(null);
@@ -221,10 +225,12 @@ export function OpenHiggsfieldApp({ fontClassName = "" }: { fontClassName?: stri
   }, [historyLoaded, history]);
 
   useEffect(() => {
-    void hasPlatformCredentials().then((ready) => {
-      setKeyConfigured(ready);
-      if (!ready) setKeysOpen(true);
-    });
+    void getPlatformKeyStatus()
+      .then((status) => {
+        setKeyStatus(status);
+        if (!status.configured) setKeysOpen(true);
+      })
+      .catch(() => setError("Could not reach the studio server — reload the page."));
   }, []);
 
   useEffect(() => {
@@ -629,6 +635,7 @@ export function OpenHiggsfieldApp({ fontClassName = "" }: { fontClassName?: stri
             onView={switchView}
             busy={busy}
             keyConfigured={keyConfigured}
+            keyManaged={keyStatus.managed}
             onKeys={openKeys}
           />
 
@@ -700,14 +707,16 @@ export function OpenHiggsfieldApp({ fontClassName = "" }: { fontClassName?: stri
         {keysOpen && (
           <KeyModal
             configured={keyConfigured}
+            managed={keyStatus.managed}
+            authEnabled={keyStatus.authEnabled}
             onClose={() => setKeysOpen(false)}
             onSaved={() => {
-              setKeyConfigured(true);
+              setKeyStatus((current) => ({ ...current, configured: true }));
               setKeysOpen(false);
               setError(null);
             }}
             onCleared={() => {
-              setKeyConfigured(false);
+              setKeyStatus((current) => ({ ...current, configured: false }));
             }}
           />
         )}
