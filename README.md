@@ -53,15 +53,15 @@ sem password, o estúdio recusa todos os pedidos.
 | `HF_API_BASE_URL` | Origem da API: `https://api.higgsfield.ai` |
 | `HF_API_KEY` | Chave Higgsfield da Futuru, formato `id:secret` |
 | `STUDIO_PASSWORD` | Password da equipa para entrar no estúdio |
-| `OPEN_HIGGSFIELD_READ_WRITE_TOKEN` | Token do Vercel Blob, para carregar imagens/vídeos/áudio de referência |
+| `BLOB_READ_WRITE_TOKEN` | Token do Vercel Blob, para carregar imagens/vídeos/áudio de referência. O Vercel define-o sozinho ao ligar o store; `OPEN_HIGGSFIELD_READ_WRITE_TOKEN` também é aceite |
 
 ---
 
 ## Deploy no Vercel
 
 1. Importar o repositório no Vercel (framework: Next.js; o pnpm é detetado).
-2. **Storage → Blob → Create**, ligar ao projeto e copiar o token de
-   leitura/escrita para `OPEN_HIGGSFIELD_READ_WRITE_TOKEN`.
+2. **Storage → Blob → Create** (acesso público) e ligar ao projeto; o Vercel
+   define `BLOB_READ_WRITE_TOKEN` sozinho.
 3. Definir `HF_API_BASE_URL`, `HF_API_KEY` e `STUDIO_PASSWORD` em
    **Settings → Environment Variables** (Production e Preview).
 4. Deploy. Opcional: domínio próprio, por exemplo `studio.futuru.pt`.
